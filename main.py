@@ -333,4 +333,5 @@ __**!skip**__ : permet de sauter la musique courante et aller vers la prochaine 
     embed.set_footer(text="akitologique", icon_url=akito_image)
     await ctx.send(embed=embed)
 
+# run le bot
 bot.run(token)
