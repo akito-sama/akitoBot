@@ -1,4 +1,5 @@
 git+https://github.com/Rapptz/discord.py
+ffmpeg
 dnspython==1.16.0
 youtube_dl
 pyNaCl
