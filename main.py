@@ -336,8 +336,8 @@ __**!disconnect**__ :  permet de deconnecter le bot du salon de musique
 __**!skip**__ : permet de sauter la musique courante et aller vers la prochaine musique dans la queue
 """)
     akito.member = bot.get_user(537430027479023627)
-    akito.avatar = akito.member.avatar_url
-    embed.set_footer(text="akitologique", icon_url=akito.avatar)
+    akito.avatar = akito.member.avatar_url if akito.member else None
+    embed.set_footer(text="akitologique", icon_url=akito.avatar if akito.member else None)
     await ctx.send(embed=embed)
 
 bot.run(token)
