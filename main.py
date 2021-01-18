@@ -6,16 +6,13 @@ from math_parse import calculate
 from secret import token
 
 
-class Akito():
-    pass
-
 bot = commands.Bot(command_prefix="!", description="le bot akitologique", help_command=None)
 bot.remove_command("help")
 rules_ = "les regles sont :\npas d'insultes\npas de moqueries\ns'amuser avec la communité"
 get = discord.utils.get
 tube = youtube_dl.YoutubeDL()
 musics = {}
-akito = Akito()
+akito_image = "https://images-ext-1.discordapp.net/external/6SIGmjpKTicusFTGgZAPll8BeL2y5CwqADOPtxvy6LE/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/537430027479023627/5f8e2eee4430686b5735620f39d18cbe.webp"
 
 class Video:
     """docstring for Video cherche pas à comprendre"""
@@ -87,8 +84,9 @@ async def queue(ctx):
     else:
         value = "la queue est vide"
     embed.add_field(name="les musics", value=value)
-    embed.set_footer(text="akitologique", icon_url=akito_image_url)
+    embed.set_footer(text="akitologique", icon_url=akito_image)
     embed.set_thumbnail(url="https://th.bing.com/th/id/OIP.lkVlOtVvcbOVnLxiefC0CwHaFj?pid=Api&rs=1")
+    embed.color = discord.Color(0Xff751a)
     await ctx.send(embed=embed)
 
 
@@ -142,7 +140,7 @@ nbr of text channel : {len(server.text_channels)}
 nbr of voice channel : {len(server.voice_channels)}
 description : {server.description}
 """
-    embed.set_footer(text="akitologique", icon_url=akito.avatar)
+    embed.set_footer(text="akitologique", icon_url=akito_image)
     embed.add_field(name="__infos__", value=server_info)
     embed.set_thumbnail(url=server.icon_url)
     embed.color = discord.Color(0Xff751a)
@@ -151,12 +149,12 @@ description : {server.description}
 
 @bot.command()
 @commands.has_permissions(manage_messages=True)
-async def clear(ctx, nbr, member: discord.Member=None,*reason):
+async def clear(ctx, nbr, member: discord.Member = None, *reason):
     reason = " ".join(reason)
     await ctx.channel.send("in deleting ...")
     messages = await ctx.channel.history(limit=int(nbr) + 2).flatten()
     for message in messages:
-        if message.author == member or member == None:
+        if message.author == member or member is None:
             await message.delete()
     if reason:
         await ctx.channel.send(f"les messages ont été supprimé par reason : {reason}")
@@ -166,30 +164,27 @@ async def clear(ctx, nbr, member: discord.Member=None,*reason):
 async def me(ctx):
     dico = {False: "smile", True: "heart"}
     embed = discord.Embed(title=f"** Mon createur Akito :{dico[ctx.author.name == 'akito']}: **", description="ce n'est pas un être humain")
-    embed.set_thumbnail(url=akito.avatar)
-    embed.set_footer(text="akitologique", icon_url=akito.avatar)
+    embed.set_thumbnail(url=akito_image)
+    embed.set_footer(text="akitologique", icon_url=akito_image)
     await ctx.send(embed=embed)
 
 
 @bot.command()
-async def avatar(ctx, member: discord.Member=None):
+async def avatar(ctx, member: discord.Member = None):
     member = ctx.author if not member else member
-    if isinstance(member, discord.Member):
-        if not str(member.activity) == "None":
-            embed = discord.Embed(title=f"{member.name}", description=f"{member.activity}")
-        else:
-            embed = discord.Embed(title=f"{member.name}")
-        embed.set_thumbnail(url=member.avatar_url)
-        await ctx.send(embed=embed)
+    if not str(member.activity) == "None":
+        embed = discord.Embed(title=f"{member.name}", description=f"{member.activity}")
     else:
-        await ctx.send(member.avatar_url)
+        embed = discord.Embed(title=f"{member.name}")
+    embed.set_thumbnail(url=member.avatar_url)
+    await ctx.send(embed=embed)
 
 
 
 @bot.command()
 async def say(ctx, nbr=1, *text):
     text = " ".join(text)
-    for i in '_'*int(nbr):
+    for i in '_' * int(nbr):
         await ctx.channel.send(text)
 
 
@@ -335,9 +330,7 @@ __**!continu**__ : permet de reprendre la musique mit en pause
 __**!disconnect**__ :  permet de deconnecter le bot du salon de musique
 __**!skip**__ : permet de sauter la musique courante et aller vers la prochaine musique dans la queue
 """)
-    akito.member = bot.get_user(537430027479023627)
-    akito.avatar = akito.member.avatar_url if akito.member else None
-    embed.set_footer(text="akitologique", icon_url=akito.avatar if akito.member else "https://wallpapercave.com/wp/wp3277949.jpg")
+    embed.set_footer(text="akitologique", icon_url=akito_image)
     await ctx.send(embed=embed)
 
 bot.run(token)
