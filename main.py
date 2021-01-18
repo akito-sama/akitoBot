@@ -337,7 +337,7 @@ __**!skip**__ : permet de sauter la musique courante et aller vers la prochaine 
 """)
     akito.member = bot.get_user(537430027479023627)
     akito.avatar = akito.member.avatar_url if akito.member else None
-    embed.set_footer(text="akitologique", icon_url=akito.avatar if akito.member else None)
+    embed.set_footer(text="akitologique", icon_url=akito.avatar if akito.member else "https://wallpapercave.com/wp/wp3277949.jpg")
     await ctx.send(embed=embed)
 
 bot.run(token)
