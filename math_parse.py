@@ -1,3 +1,6 @@
+import random
+
+
 def __parse__(string: str) -> list:
     string = "".join(i if i != ")" else i + " " for i in string)
     list_ = []
@@ -7,10 +10,15 @@ def __parse__(string: str) -> list:
         i += s
         if i >= len(string):
             break
-        if string[i] in "+-*/^":
-            if string[i] == "-":
-                list_.append('-')
-            elif nbr != "":
+        if string[i] in "+-*/":
+            if string[i] == "-" and not nbr:
+                list_.append("-")
+            elif string[i] == "-" and nbr:
+                list_.append(float(nbr))
+                for j in ("+", '-'):
+                    list_.append(j)
+                nbr = ''
+            elif nbr:
                 list_.append(float(nbr))
                 list_.append(string[i])
                 nbr = ""
@@ -24,13 +32,16 @@ def __parse__(string: str) -> list:
         if i == len(string) - 1 and nbr != "":
             list_.append(float(nbr))
     nbr = ''
-    for i in range(len(list_)):
-        try:
-            if list_[i] == "-":
+    try:
+        for i in range(len(list_)):
+            if list_[i] == "-" and list_[i + 1] != '-':
                 del list_[i]
                 list_[i] = -list_[i]
-        except:
-            pass
+            elif list_[i] == "-" == list_[i + 1]:
+                del list_[i]
+                del list_[i]
+    except:
+        pass
     return list_
 
 
@@ -48,7 +59,7 @@ def __subcalc__(liste, dico: dict):
 
 def calculate(string: str) -> int:
     liste = __parse__(string)
-    __subcalc__(liste, {"^": float.__pow__})
+    print(liste)
     __subcalc__(liste, {"*": float.__mul__, "/": float.__truediv__})
     __subcalc__(liste, {"+": float.__add__, "-": float.__sub__})
     return int(liste[0]) if liste[0].is_integer() else liste[0]
@@ -67,4 +78,13 @@ def __count__(n):
 
 
 if __name__ == '__main__':
-    print(calculate("((-1*3) + 6.7)"))
+    def randomize():
+        string = ""
+        for i in range(b := random.randint(10, 20) // 2):
+            a = str(random.randint(-10, 10))
+            operator = random.choice("+-*/") if i != b - 1 else ''
+            string += a + operator
+        return string
+    print(a := randomize())
+    # print(calculate("5^0-2+3+10-8^4/4/-6"))
+    print(round(calculate(a), 4))
