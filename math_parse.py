@@ -85,6 +85,7 @@ if __name__ == '__main__':
             operator = random.choice("+-*/") if i != b - 1 else ''
             string += a + operator
         return string
-    print(a := randomize())
+    a = randomize()
+    print(a)
     # print(calculate("5^0-2+3+10-8^4/4/-6"))
     print(round(calculate(a), 4))
