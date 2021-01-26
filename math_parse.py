@@ -80,7 +80,8 @@ def __count__(n):
 if __name__ == '__main__':
     def randomize():
         string = ""
-        for i in range(b := random.randint(10, 20) // 2):
+        b = random.randint(10, 20) // 2
+        for i in range(b):
             a = str(random.randint(-10, 10))
             operator = random.choice("+-*/") if i != b - 1 else ''
             string += a + operator
