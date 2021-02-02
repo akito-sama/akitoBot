@@ -4,6 +4,7 @@ from pendu import liste
 from formats import dictionnaire as dicto
 from math_parse import calculate
 from secret import token
+import web_cogs
 
 
 bot = commands.Bot(command_prefix="!", description="le bot akitologique", help_command=None)
@@ -12,7 +13,7 @@ rules_ = "les regles sont :\npas d'insultes\npas de moqueries\ns'amuser avec la 
 get = discord.utils.get
 tube = youtube_dl.YoutubeDL()
 musics = {}
-akito_image = "https://images-ext-1.discordapp.net/external/6SIGmjpKTicusFTGgZAPll8BeL2y5CwqADOPtxvy6LE/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/537430027479023627/5f8e2eee4430686b5735620f39d18cbe.webp"
+cog = web_cogs.WebCogs(bot)
 
 class Video:
     """docstring for Video cherche pas à comprendre"""
@@ -39,7 +40,7 @@ async def on_ready():
 async def on_message(message):
     try:
         liste = ["slm", "hello", "bonjour", "ohayo", "salam", "hi"]
-        if message.content.split()[0] in liste and message.author == bot.get_user(537430027479023627) and message.guild.id == 716083740836888587:
+        if message.content.split()[0] in liste and message.author == await message.guild.fetch_member(537430027479023627) and message.guild.id == 716083740836888587:
             await message.channel.send(f"{message.content.split()[0]} mon createur akito")
         elif message.content in liste:
             await message.channel.send("je t'aime pas toi ")
@@ -84,7 +85,7 @@ async def queue(ctx):
     else:
         value = "la queue est vide"
     embed.add_field(name="les musics", value=value)
-    embed.set_footer(text="akitologique", icon_url=akito_image)
+    embed.set_footer(text="akitologique", icon_url=cog.url_akito)
     embed.set_thumbnail(url="https://th.bing.com/th/id/OIP.lkVlOtVvcbOVnLxiefC0CwHaFj?pid=Api&rs=1")
     embed.color = discord.Color(0Xff751a)
     await ctx.send(embed=embed)
@@ -140,7 +141,7 @@ nbr of text channel : {len(server.text_channels)}
 nbr of voice channel : {len(server.voice_channels)}
 description : {server.description}
 """
-    embed.set_footer(text="akitologique", icon_url=akito_image)
+    embed.set_footer(text="akitologique", icon_url=cog.url_akito)
     embed.add_field(name="__infos__", value=server_info)
     embed.set_thumbnail(url=server.icon_url)
     embed.color = discord.Color(0Xff751a)
@@ -164,8 +165,8 @@ async def clear(ctx, nbr, member: discord.Member = None, *reason):
 async def me(ctx):
     dico = {False: "smile", True: "heart"}
     embed = discord.Embed(title=f"** Mon createur Akito :{dico[ctx.author.name == 'akito']}: **", description="ce n'est pas un être humain")
-    embed.set_thumbnail(url=akito_image)
-    embed.set_footer(text="akitologique", icon_url=akito_image)
+    embed.set_thumbnail(url=cog.url_akito)
+    embed.set_footer(text="akitologique", icon_url=cog.url_akito)
     await ctx.send(embed=embed)
 
 
@@ -330,8 +331,9 @@ __**!continu**__ : permet de reprendre la musique mit en pause
 __**!disconnect**__ :  permet de deconnecter le bot du salon de musique
 __**!skip**__ : permet de sauter la musique courante et aller vers la prochaine musique dans la queue
 """)
-    embed.set_footer(text="akitologique", icon_url=akito_image)
+    embed.set_footer(text="akitologique", icon_url=cog.url_akito)
     await ctx.send(embed=embed)
 
 # run le bot
+bot.add_cog(cog)
 bot.run(token)
