@@ -15,10 +15,10 @@ def wiki_search(text, lang="fr"):
         if info_box:
             url_reponse = info_box.findNext('img')['src']
         content = soup.find('div', {'class': "mw-parser-output"})
-        ps = content.findAll('p')
+        ps = content.findAll('p')[1:]
         counter = 0
         for p in ps:
-            if p.text.strip() != "":
+            if p.text.strip() != "" and len(p.text.strip()) > 10:
                 liste.append(f'{p.text.strip()}\n')
                 counter += len(p.text)
                 if counter >= 500 or p.text.strip().endswith(':'):
@@ -69,30 +69,41 @@ def larousse(text, boolean=True):
             return tuple((f"{li.text}", f"https://www.larousse.fr/dictionnaires/francais/{li.text}\n") for li in ul), None
 
 
-def larousse_conjug(verbe, time):
+def larousse_conjug(verbe, time, mode:str):
+    mode = mode.upper()
     url = f"https://www.larousse.fr/conjugaison/francais/{verbe}"
     rqt = requests.get(url)
     liste = []
     if rqt.ok:
         soup = bs4.BeautifulSoup(rqt.text, 'html.parser')
-        h2s = soup.findAll("h3")
+        text = soup.find('p', {"class": "groupe aux"})
+        description = text.text
+        h2s = soup.findAll("h2")
         for h2 in h2s:
-            if h2.text.lower().strip() == f'-{time.lower().strip()}':
+            if h2.text.strip().startswith(mode):
                 liste.append(f'{h2.text.lower().strip()}\n')
                 break
         else:
             return
-        ul = h2.findNext('ul')
+        h3s = h2.find_all_next('h3')
+        for h3 in h3s:
+            if h3.text.lower().strip() == f'-{time.lower().strip()}':
+                liste.append(f'{h3.text.lower().strip()}\n')
+                break
+        else:
+            return
+        ul = h3.findNext('ul')
         for li in ul:
             if not isinstance(li, bs4.NavigableString):
                 liste.append(f'-{li.text}\n')
-        return liste
+        return liste, description
 
 
 if __name__ == '__main__':
-    text = input("entrer ce que vous voulez rechercher\n")
-    txt, url, *_ = wiki_search(text, lang='fr')
-    print(txt, 'url', url)
+    # text, time, mode = input("entrer ce que vous voulez rechercher\n").split()
+    # txt, url, *_ = wiki_search(text, lang='fr')
+    txt, a = larousse_conjug("manger", "passé",'subjonctif')
+    print("".join(txt), 'url')
     # text = input("bla bla bla \n")
     # c = larousse(text, True)
     # print(json.dumps(c, indent=4, ensure_ascii=False) if isinstance(c, dict) else c)

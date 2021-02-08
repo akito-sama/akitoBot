@@ -15,6 +15,18 @@ tube = youtube_dl.YoutubeDL()
 musics = {}
 cog = web_cogs.WebCogs(bot)
 
+@bot.command()
+async def add_me(ctx):
+    if ctx.author.id == bot.owner_id:
+        try:
+            cog.Akito
+            msg = await ctx.send("c'est dèja fait tkt ")
+        except:
+            cog.Akito = await ctx.guild.fetch_member(bot.owner_id)
+    else:
+        msg = await ctx.send('you are not supposed to use this méthode')
+    await msg.add_reaction('💡')
+
 class Video:
     """docstring for Video cherche pas à comprendre"""
     def __init__(self, link):
@@ -24,12 +36,8 @@ class Video:
         self.url = video['webpage_url']
         self.stream_url = format_["url"]
 
-    def __repr__(self):
-        return self.name
-
     def __str__(self):
         return self.name
-
 
 @bot.event
 async def on_ready():
@@ -38,14 +46,12 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    try:
-        liste = ["slm", "hello", "bonjour", "ohayo", "salam", "hi"]
-        if message.content.split()[0] in liste and message.author == await message.guild.fetch_member(537430027479023627) and message.guild.id == 716083740836888587:
-            await message.channel.send(f"{message.content.split()[0]} mon createur akito")
-        elif message.content in liste:
-            await message.channel.send("je t'aime pas toi ")
-    except:
-        ...
+    salutation = ("slm", "hello", "bonjour", "ohayo", "salam", "hi")
+    work = any(tuple(message.content.startswith(i) for i in salutation))
+    if work and message.author.id == 537430027479023627:
+        await message.channel.send(f"salut mon createur akito ❤")
+    elif work:
+        await message.channel.send("je t'aime pas toi")
     await bot.process_commands(message)
 
 
@@ -57,8 +63,9 @@ async def on_member_join(member):
 
 
 @bot.event
-async def on_raw_reaction_add(payload):
-    pass
+async def on_reaction_add(reaction: discord.Reaction, user):
+    if str(reaction.emoji) == '💡' and reaction.message.author == bot.user and bot.user in await reaction.users().flatten() and user != bot.user :
+        await reaction.message.delete()
 
 @bot.command()
 async def skip(ctx):
@@ -125,7 +132,7 @@ async def continu(ctx):
         ctx.send("le bot est dèjà en marche")
 
 
-bot.command()
+bot.command(name='stop')
 async def disconnect(ctx):
     client = ctx.guild.voice_client
     await client.disconnect()
@@ -145,21 +152,38 @@ description : {server.description}
     embed.add_field(name="__infos__", value=server_info)
     embed.set_thumbnail(url=server.icon_url)
     embed.color = discord.Color(0Xff751a)
-    await ctx.channel.send(embed=embed)
+    msg = await ctx.channel.send(embed=embed)
+    await msg.add_reaction('💡')
 
+@bot.event
+async def on_command_error(ctx, error):
+    embed = discord.Embed(title='Error **404**', descriprion="une erreur a été produite", color=0Xff751a)
+    embed.set_thumbnail(url='https://th.bing.com/th/id/OIP.IETjvTQTvCOFM0QmIBdhwgHaDZ?w=301&h=160&c=7&o=5&pid=1.7')
+    embed.set_footer(text="akitologique", icon_url=cog.url_akito)
+    if isinstance(error, commands.MissingRequiredArgument):
+        message = 'désolé mais tu as oublié un argument donc tu peux recommencer en mettant le bon argument'
+    elif isinstance(error, commands.CommandNotFound):
+        message = "j'ai l'impréhesion que cette commande n'existe pas mais tout existe et n'existe pas selon l'akitologie\nvu la theorie de la realité personnel :)"
+    elif isinstance(error, commands.MissingPermissions):
+        message = "tu n'a pas les permissions de cette commande"
+    else:
+        message = "une erreur s'est produite"
+    embed.add_field(name='__type :__ ', value=message)
+    message = await ctx.send(embed=embed)
+    await message.add_reaction('💡')
 
 @bot.command()
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, nbr, member: discord.Member = None, *reason):
     reason = " ".join(reason)
-    await ctx.channel.send("in deleting ...")
+    await ctx.channel.send("in deleting ...", delete_after=0.5)
     messages = await ctx.channel.history(limit=int(nbr) + 2).flatten()
     for message in messages:
         if message.author == member or member is None:
             await message.delete()
     if reason:
-        await ctx.channel.send(f"les messages ont été supprimé par reason : {reason}")
-
+        msg = await ctx.channel.send(f"les messages ont été supprimé par reason : {reason}")
+        await msg.add_reaction('💡')
 
 @bot.command(name="akito")
 async def me(ctx):
@@ -167,7 +191,8 @@ async def me(ctx):
     embed = discord.Embed(title=f"** Mon createur Akito :{dico[ctx.author.name == 'akito']}: **", description="ce n'est pas un être humain")
     embed.set_thumbnail(url=cog.url_akito)
     embed.set_footer(text="akitologique", icon_url=cog.url_akito)
-    await ctx.send(embed=embed)
+    msg = await ctx.send(embed=embed)
+    await msg.add_reaction('💡')
 
 
 @bot.command()
@@ -178,13 +203,15 @@ async def avatar(ctx, member: discord.Member = None):
     else:
         embed = discord.Embed(title=f"{member.name}")
     embed.set_thumbnail(url=member.avatar_url)
-    await ctx.send(embed=embed)
+    msg = await ctx.send(embed=embed)
+    await msg.add_reaction('💡')
 
 
 
 @bot.command()
 async def say(ctx, nbr=1, *text):
     text = " ".join(text)
+    nbr = 10 if nbr >= 10 else nbr
     for i in '_' * int(nbr):
         await ctx.channel.send(text)
 
@@ -213,10 +240,10 @@ async def pfc(ctx):
             answer = f"le bot a choisi le {choice} et tu as choisi le {emoji} bonne chance la prochaine fois :frowning:"
         embed = discord.Embed(title="**Result**", description=answer)
         embed.color = discord.Color(0Xff751a)
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
     except:
-        await ctx.channel.send("les 10 secondes se sont ecoulé")
-
+        msg = await ctx.channel.send("les 10 secondes se sont ecoulé")
+    await msg.add_reaction('💡')
 
 def indexs(liste: list, element):
     j = []
@@ -229,12 +256,12 @@ def indexs(liste: list, element):
 @bot.command()
 async def pendu(ctx):
     sob = discord.utils.get(ctx.guild.emojis, name='sobAnime')
+    sob = sob if sob else ""
     is_win = False
     dico = {True: "tu as gagné bravo :thumbsup:", False: "tu as perdu :frowning:"}
-    await ctx.channel.send("salut c'est akito le jeu du pendu a commencé")
     theme = random.choice([*dicto.keys()])
     mot = list(random.choice(dicto[theme]).lower())
-    await ctx.channel.send(f"le thème du mots est `{theme}`")
+    bienvenue = await ctx.channel.send(f"salut c'est akito le jeu du pendu a commencé\nle thème du mots est `{theme}`")
     mot_cache = ['-' for i in range(len(mot))]
     errors_nbr = 0
     dessin = await ctx.channel.send(liste[0])
@@ -244,6 +271,7 @@ async def pendu(ctx):
             await message.edit(content=f"voici le mot : {''.join(mot_cache)}")
             lettr = await bot.wait_for("message", check=lambda msg: ctx.message.author == msg.author and ctx.channel == msg.channel, timeout=60)
             lett = lettr.content
+            await lettr.delete()
             if len(lett) == 1:
                 if lett not in mot_cache and lett in mot:
                     list_ = indexs(mot, lett)
@@ -252,22 +280,24 @@ async def pendu(ctx):
                     if mot == mot_cache:
                         is_win = True
                 else:
-                    b = await ctx.channel.send("le lettre n'éxiste pas dans mots", delete_after=1)
-                    await b.delete()
+                    await ctx.channel.send("le lettre n'éxiste pas dans mots", delete_after=1)
                     errors_nbr += 1
                     await dessin.edit(content=liste[errors_nbr])
             else:
                 await ctx.channel.send("désolé mais la lettre doit contenir une seul lettre", delete_after=1)
-            await lettr.delete()
-    except:
-        await ctx.channel.send(f"le temps akitologique s'est écoulé")
-        await ctx.channel.send(f"{sob}")
 
-    await ctx.channel.send(f"{dico[is_win]} et le mot était ...")
+    except:
+        msg = await ctx.channel.send(f"le temps akitologique s'est écoulé\n{sob}")
+        await msg.add_reaction('💡')
+
+    winner = await ctx.channel.send(f"{dico[is_win]} et le mot était ...")
+    iterable = iter((3, 2, 1, ''.join(mot)))
+    msg = await ctx.send(str(next(iterable)))
     for i in range(3):
         await asyncio.sleep(1)
-        await ctx.channel.send(f"{abs(i - 3)} ...", delete_after=0.5)
-    await ctx.channel.send(f"**{''.join(mot)}**")
+        await msg.edit(content=str(next(iterable)))
+    for i in (dessin, message, bienvenue, msg, winner):
+        await i.add_reaction('💡')
 
 
 @bot.command()
@@ -290,23 +320,24 @@ async def calculat(ctx, *operation):
     except:
         embed.set_thumbnail(url="https://th.bing.com/th/id/OIP.iJZ0AGMvTlZd54hJ76YjAAHaDo?pid=Api&rs=1")
         embed.add_field(name="**Error**", value="cette command n'est pas fini donc elle est pleine de beug")
-    await ctx.send(embed=embed)
+    msg = await ctx.send(embed=embed)
+    await msg.add_reaction("💡")
+
 
 @bot.command(name="close")
 async def close_bot(ctx):
-    embed = discord.Embed()
-    embed.color = discord.Color(0Xff751a)
-    embed.set_author(name=ctx.author.nick, icon_url=ctx.author.avatar_url)
     if ctx.author.id == 537430027479023627:
+        embed = discord.Embed()
+        embed.color = discord.Color(0Xff751a)
+        embed.set_author(name=ctx.author.nick, icon_url=ctx.author.avatar_url)
         embed.set_thumbnail(url="https://th.bing.com/th/id/OIP.j03BRzxVYjrPAftq_weMWgAAAA?pid=Api&rs=1")
         embed.add_field(name="**ETAT**", value="je suis eteint")
         embed.title = "__Eteint__"
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        msg.add_reaction('💡')
         await bot.logout()
         await bot.close()
-    else:
-        embed.add_field(name="**ERROR**", value="vous ne pouvez pas utiliser cette command")
-        await ctx.send(embed=embed)
+
 
 @bot.command(name="kimi")
 async def help(ctx):
@@ -332,7 +363,8 @@ __**!disconnect**__ :  permet de deconnecter le bot du salon de musique
 __**!skip**__ : permet de sauter la musique courante et aller vers la prochaine musique dans la queue
 """)
     embed.set_footer(text="akitologique", icon_url=cog.url_akito)
-    await ctx.send(embed=embed)
+    msg = await ctx.send(embed=embed)
+    await msg.add_reaction("💡")
 
 # run le bot
 bot.add_cog(cog)
