@@ -33,7 +33,7 @@ def wiki_search(text, lang="fr"):
                 liste.append(f'\t{i}\n')
         liste.append(f'\nto see another things about thats, visits the web site {url}\n')
     elif rps.status_code == 404:
-        urlsearch = f"https://fr.wikipedia.org/w/index.php?title=Spécial:Recherche&search={text.replace(' ', '+')}"
+        urlsearch = f"https://fr.wikipedia.org/w/index.php?title=Spécial:Recherche&search={text.replace(' ', '+')}s"
         rps = requests.get(urlsearch)
         if rps.ok:
             soup = bs4.BeautifulSoup(rps.text, 'html.parser')
@@ -111,7 +111,7 @@ def larousse_conjug(verbe, time, mode:str):
 if __name__ == '__main__':
     # text, time, mode = input("entrer ce que vous voulez rechercher\n").split()
     # txt, url, *_ = wiki_search(text, lang='fr')
-    text = "gumball"
+    text = "the legend of zelda"
     print(wiki_search(text))
     # text = input("bla bla bla \n")
     # c = larousse(text, True)
