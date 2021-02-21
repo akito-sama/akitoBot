@@ -5,7 +5,7 @@ from secret import token
 import web_cogs, games, music
 
 
-bot = commands.Bot(command_prefix="!", description="le bot akitologique", help_command=None)
+bot = commands.Bot(command_prefix="!!", description="le bot akitologique", help_command=None)
 bot.remove_command("help")
 rules_ = "les regles sont :\npas d'insultes\npas de moqueries\ns'amuser avec la communité"
 get = discord.utils.get
