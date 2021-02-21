@@ -1,13 +1,13 @@
 import requests
 import bs4
-import json, collections
+import collections
 
 
 def wiki_search(text, lang="fr"):
     a = 0
-    url_reponse = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Wikipedia-logo-v2-fr.svg/langfr-150px-Wikipedia-logo-v2-fr.svg.png"
+    url_reponse = "//upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Wikipedia-logo-v2-fr.svg/langfr-150px-Wikipedia-logo-v2-fr.svg.png"
     liste = []
-    url = f'https://{lang}.wikipedia.org/wiki/{text}'
+    url = f'https://{lang}.wikipedia.org/wiki/{text}' if not text.startswith('http') else text
     rps = requests.get(url)
     if rps.ok:
         soup = bs4.BeautifulSoup(rps.text, 'html.parser')
@@ -15,15 +15,15 @@ def wiki_search(text, lang="fr"):
         if info_box:
             url_reponse = info_box.findNext('img')['src']
         content = soup.find('div', {'class': "mw-parser-output"})
-        ps = content.findAll('p')[1:]
+        ps = content.findAll('p')[:]
         counter = 0
         for p in ps:
-            if p.text.strip() != "" and len(p.text.strip()) > 10:
+            if p.text.strip() != "" and len(p.text.strip()) > 30:
                 liste.append(f'{p.text.strip()}\n')
                 counter += len(p.text)
                 if counter >= 500 or p.text.strip().endswith(':'):
                     break
-        if liste[0].strip().endswith("may refer to:") or liste[0].replace('\n', '').endswith(':'):
+        if liste[0].strip().replace('\n', '').endswith(':'):
             a = content.findAll('h2')
             a = a[0] if a != [] else content
             liste.append(f'{a.text}\n')
@@ -33,10 +33,19 @@ def wiki_search(text, lang="fr"):
                 liste.append(f'\t{i}\n')
         liste.append(f'\nto see another things about thats, visits the web site {url}\n')
     elif rps.status_code == 404:
-        liste.append("the page is introuvable pleas verify the orthograph or the language")
+        urlsearch = f"https://fr.wikipedia.org/w/index.php?title=Spécial:Recherche&search={text.replace(' ', '+')}"
+        rps = requests.get(urlsearch)
+        if rps.ok:
+            soup = bs4.BeautifulSoup(rps.text, 'html.parser')
+            div = soup.find('div', {'class': 'mw-search-result-heading'})
+            url = div.findNext('a')['href']
+            return wiki_search(f'https://{lang}.wikipedia.org{url}')
+        else:
+            liste.append("the page is introuvable pleas verify the orthograph or the language")
+            return "".join(liste)
     else:
         liste.append("an error has been occured")
-    return "".join(liste), url_reponse, url
+    return "".join(liste), url_reponse, rps.url
 
 
 def larousse(text, boolean=True):
@@ -102,8 +111,8 @@ def larousse_conjug(verbe, time, mode:str):
 if __name__ == '__main__':
     # text, time, mode = input("entrer ce que vous voulez rechercher\n").split()
     # txt, url, *_ = wiki_search(text, lang='fr')
-    txt, a = larousse_conjug("manger", "passé",'subjonctif')
-    print("".join(txt), 'url')
+    text = "gumball"
+    print(wiki_search(text))
     # text = input("bla bla bla \n")
     # c = larousse(text, True)
     # print(json.dumps(c, indent=4, ensure_ascii=False) if isinstance(c, dict) else c)

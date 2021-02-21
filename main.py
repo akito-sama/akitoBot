@@ -1,48 +1,22 @@
 from discord.ext import commands, tasks
-import discord, asyncio, random, youtube_dl
-from pendu import liste
-from formats import dictionnaire as dicto
+import discord
 from math_parse import calculate
 from secret import token
-import web_cogs
+import web_cogs, games, music
 
 
 bot = commands.Bot(command_prefix="!", description="le bot akitologique", help_command=None)
 bot.remove_command("help")
 rules_ = "les regles sont :\npas d'insultes\npas de moqueries\ns'amuser avec la communité"
 get = discord.utils.get
-tube = youtube_dl.YoutubeDL()
-musics = {}
-cog = web_cogs.WebCogs(bot)
+cogs = (web_cogs.WebCogs(bot), games.GameCogs(bot), music.MusicCogs(bot))
 
-@bot.command()
-async def add_me(ctx):
-    if ctx.author.id == bot.owner_id:
-        try:
-            cog.Akito
-            msg = await ctx.send("c'est dèja fait tkt ")
-        except:
-            cog.Akito = await ctx.guild.fetch_member(bot.owner_id)
-    else:
-        msg = await ctx.send('you are not supposed to use this méthode')
-    await msg.add_reaction('💡')
-
-class Video:
-    """docstring for Video cherche pas à comprendre"""
-    def __init__(self, link):
-        video = tube.extract_info(link, download=False)
-        format_ = video["formats"][0]
-        self.name = video['title']
-        self.url = video['webpage_url']
-        self.stream_url = format_["url"]
-
-    def __str__(self):
-        return self.name
 
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Game(name="en train d'être akitologique", type=discord.ActivityType.custom))
     print("akito est pret pour faire de l'akitologie")
+
 
 @bot.event
 async def on_message(message):
@@ -52,6 +26,8 @@ async def on_message(message):
         await message.channel.send(f"salut mon createur akito ❤")
     elif work:
         await message.channel.send("je t'aime pas toi")
+    if message.content.startswith("!"):
+        await message.add_reaction('💡')
     await bot.process_commands(message)
 
 
@@ -64,79 +40,8 @@ async def on_member_join(member):
 
 @bot.event
 async def on_reaction_add(reaction: discord.Reaction, user):
-    if str(reaction.emoji) == '💡' and reaction.message.author == bot.user and bot.user in await reaction.users().flatten() and user != bot.user :
+    if str(reaction.emoji) == '💡' and bot.user in await reaction.users().flatten() and user != bot.user :
         await reaction.message.delete()
-
-@bot.command()
-async def skip(ctx):
-    client = ctx.guild.voice_client
-    client.stop()
-
-def play_song(client, queue, music):
-    source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(music.stream_url, before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"), 1.5)   
-    def next(_):
-        if len(queue) > 0:
-            music2 = queue[0]
-            del queue[0]
-            play_song(client, queue, music2)
-        else:
-            asyncio.run_coroutine_threadsafe(client.disconnect(), bot.loop)
-    client.play(source, after=next)
-
-
-@bot.command()
-async def queue(ctx):
-    embed = discord.Embed(title=f"** la queue de {ctx.guild.name}**", description='Musics')
-    if ctx.guild in [*musics.keys()] and len(musics[ctx.guild]) > 0:
-        value = "\n".join([i.name for i in musics[ctx.guild]])
-    else:
-        value = "la queue est vide"
-    embed.add_field(name="les musics", value=value)
-    embed.set_footer(text="akitologique", icon_url=cog.url_akito)
-    embed.set_thumbnail(url="https://th.bing.com/th/id/OIP.lkVlOtVvcbOVnLxiefC0CwHaFj?pid=Api&rs=1")
-    embed.color = discord.Color(0Xff751a)
-    await ctx.send(embed=embed)
-
-
-@bot.command()
-async def play(ctx, url):
-    client = ctx.guild.voice_client
-    if client and client.channel:
-        video = Video(url)
-        musics[ctx.guild].append(video)
-        await ctx.send(f"la musique {video.name} a été ajouté dans la queue de chansons")
-    else:
-        channel = ctx.author.voice.channel
-        video = Video(url)
-        musics[ctx.guild] = []
-        client = await channel.connect()
-        await ctx.channel.send(f"la music {video.name} a commencé bonne séance")
-        play_song(client, musics[ctx.guild], video)
-
-
-@bot.command()
-async def pause(ctx):
-    client = ctx.guild.voice_client
-    if not client.is_paused():
-        client.pause()
-    else:
-        ctx.send("le bot est dèjà en pause")
-
-
-@bot.command()
-async def continu(ctx):
-    client = ctx.guild.voice_client
-    if client.is_paused():
-        client.resume()
-    else:
-        ctx.send("le bot est dèjà en marche")
-
-
-bot.command(name='stop')
-async def disconnect(ctx):
-    client = ctx.guild.voice_client
-    await client.disconnect()
-
 
 @bot.command()
 async def infos(ctx):
@@ -217,90 +122,6 @@ async def say(ctx, nbr=1, *text):
 
 
 @bot.command()
-async def pfc(ctx):
-    embed = discord.Embed(title="the game is started", description="le jeu de pierre feuille ciseau")
-    embed.add_field(name="**défis**", value="chose your destiny :thumbsup:")
-    embed.color = discord.Color(0Xff751a)
-    message = await ctx.channel.send(embed=embed)
-    rock = get(ctx.message.guild.emojis, name="rock")
-    paper = get(ctx.message.guild.emojis, name="paper")
-    scisor = get(ctx.message.guild.emojis, name="ciseaux")
-    list_emojis = [rock, paper, scisor]
-    for emoji_ in list_emojis:
-        await message.add_reaction(emoji_)
-    try:
-        emoji, user = await bot.wait_for("reaction_add", check=lambda rea, user: user == ctx.message.author and rea.message.id == message.id and rea.emoji in list_emojis, timeout=10)
-        emoji = emoji.emoji
-        choice = random.choice(list_emojis)
-        if (choice == rock and emoji == paper) or (choice == paper and emoji == scisor) or (choice == scisor and emoji == rock): 
-            answer = f"le bot a choisi le {choice} et tu as choisi le {emoji} bien joué tu as gagné :thumbsup:"
-        elif choice == emoji:
-        	answer = f"le bot a choisi le {choice} et tu as choisi le {emoji} donc egalité :neutral_face:"
-        else:
-            answer = f"le bot a choisi le {choice} et tu as choisi le {emoji} bonne chance la prochaine fois :frowning:"
-        embed = discord.Embed(title="**Result**", description=answer)
-        embed.color = discord.Color(0Xff751a)
-        msg = await ctx.send(embed=embed)
-    except:
-        msg = await ctx.channel.send("les 10 secondes se sont ecoulé")
-    await msg.add_reaction('💡')
-
-def indexs(liste: list, element):
-    j = []
-    for i in range(len(liste)):
-        if liste[i] == element:
-            j.append(i)
-    return j
-
-
-@bot.command()
-async def pendu(ctx):
-    sob = discord.utils.get(ctx.guild.emojis, name='sobAnime')
-    sob = sob if sob else ""
-    is_win = False
-    dico = {True: "tu as gagné bravo :thumbsup:", False: "tu as perdu :frowning:"}
-    theme = random.choice([*dicto.keys()])
-    mot = list(random.choice(dicto[theme]).lower())
-    bienvenue = await ctx.channel.send(f"salut c'est akito le jeu du pendu a commencé\nle thème du mots est `{theme}`")
-    mot_cache = ['-' for i in range(len(mot))]
-    errors_nbr = 0
-    dessin = await ctx.channel.send(liste[0])
-    message = await ctx.channel.send(f"voici le mot : {''.join(mot_cache)}")
-    try:
-        while errors_nbr != 5 and mot != mot_cache:
-            await message.edit(content=f"voici le mot : {''.join(mot_cache)}")
-            lettr = await bot.wait_for("message", check=lambda msg: ctx.message.author == msg.author and ctx.channel == msg.channel, timeout=60)
-            lett = lettr.content
-            await lettr.delete()
-            if len(lett) == 1:
-                if lett not in mot_cache and lett in mot:
-                    list_ = indexs(mot, lett)
-                    for i in list_:
-                        mot_cache[i] = lett
-                    if mot == mot_cache:
-                        is_win = True
-                else:
-                    await ctx.channel.send("le lettre n'éxiste pas dans mots", delete_after=1)
-                    errors_nbr += 1
-                    await dessin.edit(content=liste[errors_nbr])
-            else:
-                await ctx.channel.send("désolé mais la lettre doit contenir une seul lettre", delete_after=1)
-
-    except:
-        msg = await ctx.channel.send(f"le temps akitologique s'est écoulé\n{sob}")
-        await msg.add_reaction('💡')
-
-    winner = await ctx.channel.send(f"{dico[is_win]} et le mot était ...")
-    iterable = iter((3, 2, 1, ''.join(mot)))
-    msg = await ctx.send(str(next(iterable)))
-    for i in range(3):
-        await asyncio.sleep(1)
-        await msg.edit(content=str(next(iterable)))
-    for i in (dessin, message, bienvenue, msg, winner):
-        await i.add_reaction('💡')
-
-
-@bot.command()
 async def rules(ctx):
     embed = discord.Embed(title="__**Rules**__", description=rules_)
     embed.color = discord.Color(0Xff751a)
@@ -367,5 +188,6 @@ __**!skip**__ : permet de sauter la musique courante et aller vers la prochaine 
     await msg.add_reaction("💡")
 
 # run le bot
-bot.add_cog(cog)
+for cog in cogs:
+    bot.add_cog(cog)
 bot.run(token)

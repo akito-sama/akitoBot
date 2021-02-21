@@ -7,18 +7,17 @@ class WebCogs(commands.Cog):
     """docstring for WebCogs"""
 
     def __init__(self, bot: commands.Bot):
-        super(WebCogs, self).__init__()
+        super().__init__()
         self.bot = bot
         self.url_akito = 'https://cdn.discordapp.com/avatars/537430027479023627/8d60edbed8d2fa62e543dd086fefddb9.webp?size=1024'
 
     @commands.command()
-    async def wiki(self, ctx, *text):
-        text = " ".join(text).title()
+    async def wiki(self, ctx, *, text):
         string, image, url = requetes.wiki_search(text)
-        embed = discord.Embed(title=f'**{text}**', color=0Xff751a)
-        for i in self.__separe(string, 600):
+        embed = discord.Embed(title=f'**{text}**', color=0Xff751a, url=url)
+        for i in self.__separe(string, 700):
             embed.add_field(name='\u200b', value=i, inline=False)
-        embed.set_thumbnail(url=(f'https:{image}') if not image.startswith('http') else image)
+        embed.set_thumbnail(url=(f'https:{image}'))
         embed.set_footer(text="akitologique from wikipédia", icon_url=self.url_akito)
         msg = await ctx.send(embed=embed)
         await msg.add_reaction('💡')
