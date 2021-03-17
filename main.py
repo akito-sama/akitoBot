@@ -26,7 +26,7 @@ async def on_message(message):
         await message.channel.send(f"salut mon createur akito ❤")
     elif work:
         await message.channel.send("je t'aime pas toi")
-    if message.content.startswith("!"):
+    if message.content.startswith("!!"):
         await message.add_reaction('💡')
     await bot.process_commands(message)
 

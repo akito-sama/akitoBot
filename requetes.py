@@ -45,7 +45,7 @@ def wiki_search(text, lang="fr"):
             return "".join(liste)
     else:
         liste.append("an error has been occured")
-    return "".join(liste), url_reponse, rps.url
+    return "".join(liste), url_reponse.replace("220px", "1000px"), rps.url
 
 
 def larousse(text, boolean=True):
@@ -111,8 +111,8 @@ def larousse_conjug(verbe, time, mode:str):
 if __name__ == '__main__':
     # text, time, mode = input("entrer ce que vous voulez rechercher\n").split()
     # txt, url, *_ = wiki_search(text, lang='fr')
-    text = "the legend of zelda"
-    print(wiki_search(text))
+    text = "one piece"
+    print(wiki_search(text)[1])
     # text = input("bla bla bla \n")
     # c = larousse(text, True)
     # print(json.dumps(c, indent=4, ensure_ascii=False) if isinstance(c, dict) else c)

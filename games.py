@@ -20,28 +20,28 @@ class GameCogs(commands.Cog):
         embed.add_field(name="**défis**", value="chose your destiny :thumbsup:")
         embed.color = discord.Color(0Xff751a)
         message = await ctx.channel.send(embed=embed)
-        rock = self.get(ctx.message.guild.emojis, name="rock")
-        paper = self.get(ctx.message.guild.emojis, name="paper")
-        scisor = self.get(ctx.message.guild.emojis, name="ciseaux")
-        list_emojis = [rock, paper, scisor]
+        list_emojis = ('🪨', '📜', '✂️')
+        dico_issues = {
+        "tu as gagné": ({"🪨": "✂️", "✂️": "📜", "📜": "🪨"}, "thumbsup"),
+        "tu as perdu": ({"✂": "🪨", "📜": "✂️", "🪨": "📜"}, "frowning"),
+        "egalité": ({"✂": "✂", "🪨": "🪨", "📜": "📜"}, "expressionless")
+        }
+
         for emoji_ in list_emojis:
             await message.add_reaction(emoji_)
         try:
-            emoji, user = await self.bot.wait_for("reaction_add", check=lambda rea, user: user == ctx.message.author and rea.message.id == message.id and rea.emoji in list_emojis, timeout=10)
-            emoji = emoji.emoji
-            choice = random.choice(list_emojis)
-            if (choice == rock and emoji == paper) or (choice == paper and emoji == scisor) or (choice == scisor and emoji == rock): 
-                answer = f"le bot a choisi le {choice} et tu as choisi le {emoji} bien joué tu as gagné :thumbsup:"
-            elif choice == emoji:
-            	answer = f"le bot a choisi le {choice} et tu as choisi le {emoji} donc egalité :neutral_face:"
-            else:
-                answer = f"le bot a choisi le {choice} et tu as choisi le {emoji} bonne chance la prochaine fois :frowning:"
-            embed = discord.Embed(title="**Result**", description=answer)
+            reaction, user = await self.bot.wait_for("reaction_add", check=lambda rea, user: user == ctx.message.author and rea.message.id == message.id and rea.emoji in list_emojis, timeout=10)
+            emoji = str(reaction.emoji)
+            issue = random.choice(('tu as gagné', 'tu as perdu', 'égalité'))
+            bot_choice = dico_issues[issue][0][emoji]
+            description = f"le bot a choisi {bot_choice} et toi tu as choisi {emoji} donc {issue} :{dico_issues[issue][1]}:"
+            embed = discord.Embed(title="**Result**", description=description)
             embed.color = discord.Color(0Xff751a)
             msg = await ctx.send(embed=embed)
         except:
             msg = await ctx.channel.send("les 10 secondes se sont ecoulé")
         await msg.add_reaction('💡')
+        await message.add_reaction('💡')
 
     @commands.command()
     async def pendu(self, ctx):
