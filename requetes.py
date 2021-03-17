@@ -18,7 +18,7 @@ def wiki_search(text, lang="fr"):
         ps = content.findAll('p')[:]
         counter = 0
         for p in ps:
-            if p.text.strip() != "" and len(p.text.strip()) > 30:
+            if p.text.strip() != "" and len(p.text.strip()) > 70:
                 liste.append(f'{p.text.strip()}\n')
                 counter += len(p.text)
                 if counter >= 500 or p.text.strip().endswith(':'):
