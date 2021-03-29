@@ -39,7 +39,7 @@ class WebCogs(commands.Cog):
         embed.add_field(name="**Score d'animé**", value=f"score :{anime.score}\nrank : {anime.rank}\npopularité: {anime.popularity}", inline=True)
         embed.add_field(name="**Status**", value=f"{anime.status}", inline=True)
         embed.add_field(name="**Studios**", value=f"{', '.join(anime.studios)}", inline=True)
-        embed.set_footer(text="Akitologique from wikipédia", icon_url=self.url_akito)
+        embed.set_footer(text="Akitologique from MyAnimeList", icon_url=self.url_akito)
         await ctx.send(embed=embed)
 
     @commands.command()
