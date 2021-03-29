@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import requetes
 import mal
-import googletrans
+import translators as ts
 
 
 class WebCogs(commands.Cog):
@@ -26,13 +26,12 @@ class WebCogs(commands.Cog):
 
     @commands.command()
     async def anime(self, ctx, *, text):
-        translator = googletrans.Translator()
         anime = mal.Anime(mal.AnimeSearch(text, timeout=2).results[0].mal_id)
         image = anime.image_url
         embed = discord.Embed(title=f'**{anime.title}**', color=0Xff751a, url=anime.url)
         embed.set_thumbnail(url=image)
         translate_syno = anime.synopsis
-        translate_syno = translator.translate(anime.synopsis, 'fr').text
+        translate_syno = ts.google(anime.synopsis, 'en', "fr")
         embed.add_field(name="**Synopsis**", value=f"{self.limite(translate_syno[:1000])}", inline=False)
         embed.add_field(name="**Nombre d'épisodes**", value=f"{anime.episodes}", inline=True)
         embed.add_field(name="**Genre**", value=f"{', '.join(anime.genres)}", inline=True)

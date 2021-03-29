@@ -20,6 +20,8 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    if message.author == bot.user:
+        return
     salutation = ("slm", "hello", "bonjour", "ohayo", "salam", "hi", "salut")
     work = any(tuple(message.content.lower().startswith(i.lower()) for i in salutation))
     if work and message.author.id == 537430027479023627:

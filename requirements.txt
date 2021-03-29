@@ -6,4 +6,4 @@ pyNaCl
 bs4
 requests
 mal-api
-googletrans
+translate-api
