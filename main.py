@@ -20,8 +20,8 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    salutation = ("slm", "hello", "bonjour", "ohayo", "salam", "hi")
-    work = any(tuple(message.content.startswith(i) for i in salutation))
+    salutation = ("slm", "hello", "bonjour", "ohayo", "salam", "hi", "salut")
+    work = any(tuple(message.content.lower().startswith(i.lower()) for i in salutation))
     if work and message.author.id == 537430027479023627:
         await message.channel.send(f"salut mon createur akito ❤")
     elif work:
@@ -43,6 +43,7 @@ async def on_reaction_add(reaction: discord.Reaction, user):
     if str(reaction.emoji) == '💡' and bot.user in await reaction.users().flatten() and user != bot.user :
         await reaction.message.delete()
 
+
 @bot.command()
 async def infos(ctx):
     server = ctx.guild
@@ -60,6 +61,7 @@ description : {server.description}
     msg = await ctx.channel.send(embed=embed)
     await msg.add_reaction('💡')
 
+
 @bot.event
 async def on_command_error(ctx, error):
     embed = discord.Embed(title='Error **404**', descriprion="une erreur a été produite", color=0Xff751a)
@@ -72,10 +74,11 @@ async def on_command_error(ctx, error):
     elif isinstance(error, commands.MissingPermissions):
         message = "tu n'a pas les permissions de cette commande"
     else:
-        message = "une erreur s'est produite"
+        message = f"une erreur s'est produite"
     embed.add_field(name='__type :__ ', value=message)
     message = await ctx.send(embed=embed)
     await message.add_reaction('💡')
+
 
 @bot.command()
 @commands.has_permissions(manage_messages=True)
@@ -89,6 +92,7 @@ async def clear(ctx, nbr, member: discord.Member = None, *reason):
     if reason:
         msg = await ctx.channel.send(f"les messages ont été supprimé par reason : {reason}")
         await msg.add_reaction('💡')
+
 
 @bot.command(name="akito")
 async def me(ctx):
@@ -110,7 +114,6 @@ async def avatar(ctx, member: discord.Member = None):
     embed.set_thumbnail(url=member.avatar_url)
     msg = await ctx.send(embed=embed)
     await msg.add_reaction('💡')
-
 
 
 @bot.command()
@@ -186,6 +189,14 @@ __**!skip**__ : permet de sauter la musique courante et aller vers la prochaine 
     embed.set_footer(text="akitologique", icon_url=cog.url_akito)
     msg = await ctx.send(embed=embed)
     await msg.add_reaction("💡")
+
+
+@bot.command()
+async def update(ctx):
+    if ctx.author.id == 537430027479023627:
+        for cog in cogs:
+            cog.url_akito = ctx.author.avatar_url
+        await ctx.send(f"c'est changé :blush: en {ctx.author.avatar_url}")
 
 # run le bot
 for cog in cogs:

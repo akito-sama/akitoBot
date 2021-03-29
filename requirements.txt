@@ -5,3 +5,5 @@ youtube_dl
 pyNaCl
 bs4
 requests
+mal-api
+googletrans

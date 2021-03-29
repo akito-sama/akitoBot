@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import requetes
+import mal
+import googletrans
 
 
 class WebCogs(commands.Cog):
@@ -9,7 +11,7 @@ class WebCogs(commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.url_akito = 'https://cdn.discordapp.com/avatars/537430027479023627/8d60edbed8d2fa62e543dd086fefddb9.webp?size=1024'
+        self.url_akito = 'https://cdn.discordapp.com/avatars/537430027479023627/f76a8762543f14c2c88335b8fe7b52c7.webp?size=1024'
 
     @commands.command()
     async def wiki(self, ctx, *, text):
@@ -21,6 +23,25 @@ class WebCogs(commands.Cog):
         embed.set_footer(text="akitologique from wikipédia", icon_url=self.url_akito)
         msg = await ctx.send(embed=embed)
         await msg.add_reaction('💡')
+
+    @commands.command()
+    async def anime(self, ctx, *, text):
+        translator = googletrans.Translator()
+        anime = mal.Anime(mal.AnimeSearch(text, timeout=2).results[0].mal_id)
+        image = anime.image_url
+        embed = discord.Embed(title=f'**{anime.title}**', color=0Xff751a, url=anime.url)
+        embed.set_thumbnail(url=image)
+        translate_syno = anime.synopsis
+        translate_syno = translator.translate(anime.synopsis, 'fr').text
+        embed.add_field(name="**Synopsis**", value=f"{self.limite(translate_syno[:1000])}", inline=False)
+        embed.add_field(name="**Nombre d'épisodes**", value=f"{anime.episodes}", inline=True)
+        embed.add_field(name="**Genre**", value=f"{', '.join(anime.genres)}", inline=True)
+        embed.add_field(name="**Main character**", value=f"{anime.characters[0].name}")
+        embed.add_field(name="**Score d'animé**", value=f"score :{anime.score}\nrank : {anime.rank}\npopularité: {anime.popularity}", inline=True)
+        embed.add_field(name="**Status**", value=f"{anime.status}", inline=True)
+        embed.add_field(name="**Studios**", value=f"{', '.join(anime.studios)}", inline=True)
+        embed.set_footer(text="Akitologique from wikipédia", icon_url=self.url_akito)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def laros(self, ctx, *text):
@@ -81,3 +102,13 @@ class WebCogs(commands.Cog):
                 is_time = False
         liste.append(string2)
         return liste
+
+    def limite(self, string):
+        limite = 1000 if len(string) >= 1000 else len(string)
+        string[:limite]
+        if limite != len(string):
+            for i in range(limite, limite + 24):
+                string += string[i]
+                if string[i] == ' ':
+                    break
+        return string
