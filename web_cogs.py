@@ -48,11 +48,11 @@ class WebCogs(commands.Cog):
         image = anime.image_url
         embed = discord.Embed(title=f'**{anime.title}**', color=0Xff751a, url=anime.url)
         embed.set_thumbnail(url=image)
-        translate_syno, status, genres, main_char = ts.google(f"{anime.synopsis}****{anime.status}****{', '.join(anime.genres)}****{anime.characters[0].name}", 'en', lang).split("****")
+        translate_syno, status, genres = ts.google(f"{anime.synopsis}****{anime.status}****{', '.join(anime.genres)}", 'en', lang).split("****")
         embed.add_field(name="**Synopsis**", value=f"{self.limite(translate_syno[:1000])}", inline=False)
         embed.add_field(name="**Nombre d'épisodes**", value=f"{anime.episodes}", inline=True)
         embed.add_field(name="**Genre**", value=genres, inline=True)
-        embed.add_field(name="**Main character**", value=main_char)
+        embed.add_field(name="**Main character**", value=f"{anime.characters[0].name}")
         embed.add_field(name="**Score d'animé**", value=f"score :{anime.score}\nrank : {anime.rank}\npopularité: {anime.popularity}", inline=True)
         embed.add_field(name="**Status**", value=status, inline=True)
         embed.add_field(name="**Studios**", value=f"{', '.join(anime.studios)}", inline=True)
