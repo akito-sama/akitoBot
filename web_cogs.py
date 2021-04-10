@@ -12,6 +12,7 @@ class WebCogs(commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
+        self.languages =  ['af', 'am', 'ar', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'ceb', 'co', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'fy', 'ga', 'gd', 'gl', 'gu', 'ha', 'haw', 'hi', 'hmn', 'hr', 'ht', 'hu', 'hy', 'id', 'ig', 'is', 'it', 'iw', 'ja', 'jw', 'ka', 'kk', 'km', 'kn', 'ko', 'ku', 'ky', 'la', 'lb', 'lo', 'lt', 'lv', 'mg', 'mi', 'mk', 'ml', 'mn', 'mr', 'ms', 'mt', 'my', 'ne', 'nl', 'no', 'ny', 'or', 'pa', 'pl', 'ps', 'pt', 'ro', 'ru', 'rw', 'sd', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'sr', 'st', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'tk', 'tl', 'tr', 'tt', 'ug', 'uk', 'ur', 'uz', 'vi', 'xh', 'yi', 'yo', 'zh-CN', 'zh-TW', 'zu']
         self.url_akito = 'https://cdn.discordapp.com/avatars/537430027479023627/1b276d12906ca8a20e182ce3b366075b.webp?size=1024'
 
     @commands.command()
@@ -27,26 +28,31 @@ class WebCogs(commands.Cog):
 
     @commands.command()
     async def anime(self, ctx, *, text):
+        try:
+            anime, lang = text.split(' !')
+        except:
+            anime = text
+            lang = "fr"
         anime = mal.Anime(mal.AnimeSearch(text, timeout=2).results[0].mal_id)
-        embed = self.anime_embed(anime)
+        embed = self.anime_embed(anime, lang)
         await ctx.send(embed=embed)
 
     @commands.command(name="randanime")
-    async def random_anime(self, ctx):
+    async def random_anime(self, ctx, lang="fr"):
         nbr_anime = random.randint(1, 7612)
         anime = mal.Anime(nbr_anime)
-        embed = self.anime_embed(anime)
+        embed = self.anime_embed(anime, lang)
         await ctx.send(embed=embed)
 
-    def anime_embed(self, anime) -> discord.Embed:
+    def anime_embed(self, anime, lang) -> discord.Embed:
         image = anime.image_url
         embed = discord.Embed(title=f'**{anime.title}**', color=0Xff751a, url=anime.url)
         embed.set_thumbnail(url=image)
-        translate_syno, status, genres = ts.google(f"{anime.synopsis}****{anime.status}****{', '.join(anime.genres)}", 'en', "fr").split("****")
+        translate_syno, status, genres, main_char = ts.google(f"{anime.synopsis}****{anime.status}****{', '.join(anime.genres)}****{anime.characters[0].name}", 'en', lang).split("****")
         embed.add_field(name="**Synopsis**", value=f"{self.limite(translate_syno[:1000])}", inline=False)
         embed.add_field(name="**Nombre d'épisodes**", value=f"{anime.episodes}", inline=True)
         embed.add_field(name="**Genre**", value=genres, inline=True)
-        embed.add_field(name="**Main character**", value=f"{anime.characters[0].name}")
+        embed.add_field(name="**Main character**", value=main_char)
         embed.add_field(name="**Score d'animé**", value=f"score :{anime.score}\nrank : {anime.rank}\npopularité: {anime.popularity}", inline=True)
         embed.add_field(name="**Status**", value=status, inline=True)
         embed.add_field(name="**Studios**", value=f"{', '.join(anime.studios)}", inline=True)

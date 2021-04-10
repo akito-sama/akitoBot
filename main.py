@@ -3,6 +3,7 @@ import discord
 from math_parse import calculate
 from secret import token
 import web_cogs, games, music
+import translators as ts
 
 
 bot = commands.Bot(command_prefix="!!", description="le bot akitologique", help_command=None)
