@@ -1,4 +1,4 @@
-git+https://github.com/Rapptz/discord.py
+discord.py==1.7.1
 ffmpeg
 dnspython==1.16.0
 youtube_dl
