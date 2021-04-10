@@ -45,6 +45,7 @@ class WebCogs(commands.Cog):
         await ctx.send(embed=embed)
 
     def anime_embed(self, anime, lang) -> discord.Embed:
+        no_width = "​"
         image = anime.image_url
         embed = discord.Embed(title=f'**{anime.title}**', color=0Xff751a, url=anime.url)
         embed.set_thumbnail(url=image)
@@ -55,7 +56,7 @@ class WebCogs(commands.Cog):
         embed.add_field(name="**Main character**", value=f"{anime.characters[0].name}")
         embed.add_field(name="**Score d'animé**", value=f"score :{anime.score}\nrank : {anime.rank}\npopularité: {anime.popularity}", inline=True)
         embed.add_field(name="**Status**", value=status, inline=True)
-        embed.add_field(name="**Studios**", value=f"{', '.join(anime.studios)}", inline=True)
+        embed.add_field(name="**Studios**", value=f"{', '.join(anime.studios)}" if f"{', '.join(anime.studios)}" else no_width, inline=True)
         embed.set_footer(text="Akitologique from MyAnimeList", icon_url=self.url_akito)
         return embed
 
