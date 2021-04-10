@@ -3,6 +3,7 @@ from discord.ext import commands
 import requetes
 import mal
 import translators as ts
+import random
 
 
 class WebCogs(commands.Cog):
@@ -27,20 +28,30 @@ class WebCogs(commands.Cog):
     @commands.command()
     async def anime(self, ctx, *, text):
         anime = mal.Anime(mal.AnimeSearch(text, timeout=2).results[0].mal_id)
+        embed = self.anime_embed(anime)
+        await ctx.send(embed=embed)
+
+    @commands.command(name="randanime")
+    async def random_anime(self, ctx):
+        nbr_anime = random.randint(1, 7612)
+        anime = mal.Anime(nbr_anime)
+        embed = self.anime_embed(anime)
+        await ctx.send(embed=embed)
+
+    def anime_embed(self, anime) -> discord.Embed:
         image = anime.image_url
         embed = discord.Embed(title=f'**{anime.title}**', color=0Xff751a, url=anime.url)
         embed.set_thumbnail(url=image)
-        translate_syno = anime.synopsis
-        translate_syno = ts.google(anime.synopsis, 'en', "fr")
+        translate_syno, status, genres = ts.google(f"{anime.synopsis}****{anime.status}****{', '.join(anime.genres)}", 'en', "fr").split("****")
         embed.add_field(name="**Synopsis**", value=f"{self.limite(translate_syno[:1000])}", inline=False)
         embed.add_field(name="**Nombre d'épisodes**", value=f"{anime.episodes}", inline=True)
-        embed.add_field(name="**Genre**", value=f"{', '.join(anime.genres)}", inline=True)
+        embed.add_field(name="**Genre**", value=genres, inline=True)
         embed.add_field(name="**Main character**", value=f"{anime.characters[0].name}")
         embed.add_field(name="**Score d'animé**", value=f"score :{anime.score}\nrank : {anime.rank}\npopularité: {anime.popularity}", inline=True)
-        embed.add_field(name="**Status**", value=f"{anime.status}", inline=True)
+        embed.add_field(name="**Status**", value=status, inline=True)
         embed.add_field(name="**Studios**", value=f"{', '.join(anime.studios)}", inline=True)
         embed.set_footer(text="Akitologique from MyAnimeList", icon_url=self.url_akito)
-        await ctx.send(embed=embed)
+        return embed
 
     @commands.command()
     async def laros(self, ctx, *text):
