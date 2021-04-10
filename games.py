@@ -10,7 +10,7 @@ class GameCogs(commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.url_akito = 'https://cdn.discordapp.com/avatars/537430027479023627/8d60edbed8d2fa62e543dd086fefddb9.webp?size=1024'
+        self.url_akito = 'https://cdn.discordapp.com/avatars/537430027479023627/1b276d12906ca8a20e182ce3b366075b.webp?size=1024'
         self.get = discord.utils.get
 
 
@@ -24,7 +24,7 @@ class GameCogs(commands.Cog):
         dico_issues = {
         "tu as gagné": ({"🪨": "✂️", "✂️": "📜", "📜": "🪨"}, "thumbsup"),
         "tu as perdu": ({"✂": "🪨", "📜": "✂️", "🪨": "📜"}, "frowning"),
-        "egalité": ({"✂": "✂", "🪨": "🪨", "📜": "📜"}, "expressionless")
+        "égalité": ({"✂": "✂", "🪨": "🪨", "📜": "📜"}, "expressionless")
         }
 
         for emoji_ in list_emojis:

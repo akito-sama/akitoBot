@@ -12,7 +12,7 @@ class WebCogs(commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.url_akito = 'https://cdn.discordapp.com/avatars/537430027479023627/f76a8762543f14c2c88335b8fe7b52c7.webp?size=1024'
+        self.url_akito = 'https://cdn.discordapp.com/avatars/537430027479023627/1b276d12906ca8a20e182ce3b366075b.webp?size=1024'
 
     @commands.command()
     async def wiki(self, ctx, *, text):
